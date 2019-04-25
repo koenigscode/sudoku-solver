@@ -36,6 +36,12 @@ class Sudoku:
                 return False
 
         return True
+
+    def boxes(self):
+        for row in range(0, self.sudoku.shape[0], self.box_size):
+            for col in range(0, self.sudoku.shape[0], self.box_size):
+                yield self.sudoku[row:row+self.box_size, col:col+self.box_size]
+
     @staticmethod
     def _has_valid_shape(shape):
         x_size, y_size = shape
