@@ -32,7 +32,7 @@ class Sudoku:
 
     def _has_valid_values(self):
         for val in self.sudoku.flatten():
-            if val < 0 or val > self.sudoku.shape[0]**2:  # invalid number
+            if val < 0 or val > self.box_size**2:  # invalid number
                 return False
 
         return True
