@@ -1,48 +1,119 @@
 import numpy as np
+import time
+from copy import deepcopy
+import colorama
+from colorama import Fore
+from colorama import Style
+from lib.box import Box
+
+colorama.init()
 
 
 class Sudoku:
 
-    def __init__(self, sudoku: np.array, box_size: int):
-        if not self._has_valid_shape(sudoku.shape):
+    def __init__(self, values: np.array, box_size: int):
+        if not self._is_valid_shape(values.shape):
             raise ValueError("x size doesn't equal y size")
 
-        if sudoku.shape[0] % box_size != 0:
+        if values.shape[0] % box_size != 0:
             raise ValueError("invalid box size")
 
-        self.sudoku = sudoku
+        self.values = values.astype("int")
         self.box_size = box_size
 
     @staticmethod
     def from_file(path):
         pass
 
-    def is_valid_state(self):
-        for row, col in np.ndindex(self.sudoku.shape):
-            val = self.sudoku[row, col]  # current value
-            # number of the value's occurences in the current row
-            row_count = sum(self.sudoku[row] == val)
-            # number of the value's occurences in the current column
-            col_count = sum(self.sudoku[:, col] == val)
-
-            return row_count == 1 and col_count == 1 and self._has_valid_values()
+    def first_empty(self):
+        for irow, row in enumerate(self.values):
+            col_pos = np.where(row == 0)[0]
+            if len(col_pos) > 0:
+                return irow, np.where(row == 0)[0][0]
 
     def is_finished(self):
-        return self.is_valid_state() and sum(self.sudoku.flatten() == 0) == 0
+        return self.has_valid_state() and sum(self.values.flatten() == 0) == 0
 
-    def _has_valid_values(self):
-        for val in self.sudoku.flatten():
+    def has_valid_state(self):
+        if not self.has_valid_values():
+            return False
+
+        for irow, row in enumerate(self.values):
+            for icol in range(len(row)):
+                curr_val = self.values[irow, icol]
+                if curr_val != 0:
+                    occurrences_in_row = sum(self.values[irow] == curr_val)
+                    occurrences_in_col = sum(self.values[:, icol] == curr_val)
+
+                    if occurrences_in_row > 1 or occurrences_in_col > 1:
+                        return False
+        return True
+
+    def has_valid_values(self):
+        for val in self.values.flatten():
             if val < 0 or val > self.box_size**2:  # invalid number
                 return False
 
         return True
 
-    def boxes(self):
-        for row in range(0, self.sudoku.shape[0], self.box_size):
-            for col in range(0, self.sudoku.shape[0], self.box_size):
-                yield self.sudoku[row:row+self.box_size, col:col+self.box_size]
+    def solve(self, extended=False, timer=False):
+        if extended == False:
+            return self._solve()
+
+        res = ""
+        start = time.time()
+        solved = self.solve()
+        end = time.time()
+
+        if solved is None:
+            return "Could not be solved"
+        res += f"Original:\n{self}\nSolved:\n{solved}\n"
+
+        if time:
+            res += f"Took {end-start}ms"
+
+        return res
+
+    def _solve(self):
+
+        if not self.has_valid_state():
+            return None
+        if self.first_empty() is None:
+            if self.is_finished():
+                return self
+            return None
+
+        row, col = self.first_empty()
+        first_empty_box = Box.from_index(self, row, col)
+
+        for val in first_empty_box.missing_values:
+            new_sudoku = deepcopy(self)
+            new_sudoku.values[row][col] = val
+            solved_sudoku = new_sudoku._solve()
+
+            if solved_sudoku is not None:
+                return solved_sudoku
 
     @staticmethod
-    def _has_valid_shape(shape):
+    def _is_valid_shape(shape):
         x_size, y_size = shape
         return x_size == y_size
+
+    def __repr__(self, highlight=None):
+        s = ""
+        row_delimiter = "-" * \
+            ((len(self.values)+len(self.values)//self.box_size)*2 + 1) + "\n"
+
+        for irow, row in enumerate(self.values):
+            col = []
+            if(irow % self.box_size == 0):
+                s += row_delimiter
+            for icol, val in enumerate(row):
+                if(icol % self.box_size == 0):
+                    col.append("|")
+                if(highlight is not None and len(highlight) == 2 and irow == highlight[0] and icol == highlight[1]):
+                    col.append(f"{Fore.RED}{val}{Style.RESET_ALL}")
+                else:
+                    col.append(str(val))
+            s += f"{' '.join(col)} |\n"
+        return s + row_delimiter
