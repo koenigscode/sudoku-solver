@@ -52,8 +52,8 @@ class Sudoku:
 
         return True
 
-    def solve(self, extended=False, timer=False):
-        if extended == False:
+    def solve(self, extend=None):
+        if type(extend) != list:
             return self._solve()
 
         res = ""
@@ -63,12 +63,16 @@ class Sudoku:
 
         if solved is None:
             return "Could not be solved"
-        res += f"Original:\n{self}\nSolved:\n{solved}\n"
 
-        if time:
+        if "original" in extend:
+        res += f"Original:\n{self}\nSolved:\n{solved}\n"
+        else:
+            res += solved.__repr__()
+
+        if "timer" in extend:
             res += f"Took {end-start}ms"
 
-        return res
+        return res, solved
 
     def _solve(self):
 
