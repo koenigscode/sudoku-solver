@@ -17,7 +17,9 @@ class Sudoku:
                 empty fields should be set to 0
             box_size (int): box size (length) of the sudoku
                 most sudokus are 9x9 and therefore have a boxsize of 3
+
         """
+
         if not self._is_valid_shape(values.shape):
             raise ValueError("x size doesn't equal y size")
 
@@ -33,7 +35,9 @@ class Sudoku:
         Returns:
             tuple containing index of row and index of column
             or None if there is no empty value
+
         """
+
         for irow, row in enumerate(self.values):
             col_pos = np.where(row == 0)[0]
             if len(col_pos) > 0:
@@ -45,7 +49,9 @@ class Sudoku:
         Returns:
             true if sudoku has valid state and there are no empty values
                 (zeros) left
+
         """
+
         return self.has_valid_state() and sum(self.values.flatten() == 0) == 0
 
     def has_valid_state(self):
@@ -56,7 +62,9 @@ class Sudoku:
         Returns:
             True if all values occur in their row and column only once,
             otherwise False
+
         """
+
         if not self.has_valid_values():
             return False
 
@@ -77,7 +85,9 @@ class Sudoku:
 
         Returns:
             True if all values are within the sudoku's range, otherwise False
+
         """
+
         for val in self.values.flatten():
             if val < 0 or val > self.box_size**2:  # invalid number
                 return False
@@ -98,7 +108,9 @@ class Sudoku:
                 solved sudoku 
             Using "extend" option:
                 visual representation and solved sudoku 
+
         """
+
         if type(extend) != list:
             return self._solve()
 
@@ -126,7 +138,9 @@ class Sudoku:
         Returns:
             Sudoku if it could be solved
             otherwise None
+
         """
+
         if not self.has_valid_state():
             return None
         if self.first_empty() is None:
@@ -155,7 +169,9 @@ class Sudoku:
         Returns:
             True if width equals length
             otherwise false
+
         """
+
         x_size, y_size = shape
         return x_size == y_size
 
@@ -165,7 +181,9 @@ class Sudoku:
         Returns:
             True if box size is valid
             otherwise False
+
         """
+
         return values.shape[0] % box_size != 0
 
     def __repr__(self, highlight=None):
@@ -178,7 +196,9 @@ class Sudoku:
 
         Returns:
             visual representation of the sudoku
+
         """
+
         s = ""
         row_delimiter = "-" * \
             ((len(self.values)+len(self.values)//self.box_size)*2 + 1) + "\n"
