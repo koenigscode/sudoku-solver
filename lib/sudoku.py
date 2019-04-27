@@ -21,10 +21,10 @@ class Sudoku:
         if not self._is_valid_shape(values.shape):
             raise ValueError("x size doesn't equal y size")
 
-        if values.shape[0] % box_size != 0:
+        if not self._is_valid_box_size(box_size):
             raise ValueError("invalid box size")
 
-        self.values = values.astype("int")
+        self.values = values.astype("int")  # convert into int array
         self.box_size = box_size
 
     def first_empty(self):
@@ -158,6 +158,15 @@ class Sudoku:
         """
         x_size, y_size = shape
         return x_size == y_size
+
+    def _is_valid_box_size(box_size):
+        """Check if box size is valid
+
+        Returns:
+            True if box size is valid
+            otherwise False
+        """
+        return values.shape[0] % box_size != 0
 
     def __repr__(self, highlight=None):
         """Visual representation of the sudoku
