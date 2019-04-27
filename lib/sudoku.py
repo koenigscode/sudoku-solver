@@ -1,7 +1,7 @@
 import numpy as np
 import time
 from copy import deepcopy
-import colorama
+import colorama  # used for highlighting (coloring) text in terminal output
 from lib.box import Box
 
 colorama.init()
@@ -39,9 +39,10 @@ class Sudoku:
         """
 
         for irow, row in enumerate(self.values):
-            col_pos = np.where(row == 0)[0]
+            col_pos = np.where(row == 0)[0]  # all zeros in sudoku
+            # if there are zeros, return the position of the first one
             if len(col_pos) > 0:
-                return irow, np.where(row == 0)[0][0]
+                return irow, col_pos[0]
 
     def is_finished(self):
         """Check if the sudoku is finished and valid
@@ -71,10 +72,12 @@ class Sudoku:
         for irow, row in enumerate(self.values):
             for icol in range(len(row)):
                 curr_val = self.values[irow, icol]
-                if curr_val != 0:
+
+                if curr_val != 0:  # allow multiple zeros in a row or column
                     occurrences_in_row = sum(self.values[irow] == curr_val)
                     occurrences_in_col = sum(self.values[:, icol] == curr_val)
 
+                    # is a value occuring more than once in a row or column?
                     if occurrences_in_row > 1 or occurrences_in_col > 1:
                         return False
         return True
@@ -89,7 +92,8 @@ class Sudoku:
         """
 
         for val in self.values.flatten():
-            if val < 0 or val > self.box_size**2:  # invalid number
+            # is the value invalid?
+            if val < 0 or val > self.box_size**2:
                 return False
 
         return True
@@ -114,7 +118,7 @@ class Sudoku:
         if type(extend) != list:
             return self._solve()
 
-        res = ""
+        res = ""  # response string
         start = time.time()
         solved = self.solve()
         end = time.time()
@@ -143,19 +147,25 @@ class Sudoku:
 
         if not self.has_valid_state():
             return None
+
+        # are all values already filled in?
         if self.first_empty() is None:
+            # is the sudoku valid?
             if self.is_finished():
                 return self
             return None
 
         row, col = self.first_empty()
+        # get box in which the value is in
         first_empty_box = Box.from_index(self, row, col)
 
         for val in first_empty_box.missing_values:
             new_sudoku = deepcopy(self)
+            # replace zero with possible value
             new_sudoku.values[row][col] = val
             solved_sudoku = new_sudoku._solve()
 
+            # if the sudoku could be solved, pass it on to the calling function
             if solved_sudoku is not None:
                 return solved_sudoku
 
@@ -199,21 +209,31 @@ class Sudoku:
 
         """
 
-        s = ""
+        res = ""
+
+        # string to be placed between rows
         row_delimiter = "-" * \
             ((len(self.values)+len(self.values)//self.box_size)*2 + 1) + "\n"
 
         for irow, row in enumerate(self.values):
             col = []
+
+            # is the end of a box reached?
             if(irow % self.box_size == 0):
-                s += row_delimiter
+                res += row_delimiter
+
             for icol, val in enumerate(row):
                 if(icol % self.box_size == 0):
+                    # is the end of a box reached?
                     col.append("|")
+
+                # is there a value to be highlighted?
                 if(highlight is not None and len(highlight) == 2 and irow == highlight[0] and icol == highlight[1]):
                     col.append(
                         f"{colorama.Fore.RED}{val}{colorama.Style.RESET_ALL}")
                 else:
                     col.append(str(val))
-            s += f"{' '.join(col)} |\n"
-        return s + row_delimiter
+
+            res += f"{' '.join(col)} |\n"
+
+        return res + row_delimiter
