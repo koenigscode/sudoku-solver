@@ -89,12 +89,17 @@ class Sudoku:
     def solve(self, extend=None):
         """Solve the sudoku
         Args:
-            extended (list): return the sudoku as a formatted string
-                instead of the solved sudoku
+            extended (list): return the sudoku as well as a formatted string
                 contains different options in form of a string within the list:
                 "original": show the original and solved sudoku;
                     also label the original and saved one
                 "timer": show the time taken to solve the sudoku
+
+        Returns:
+            Not using "extend" option:
+                solved sudoku 
+            Using "extend" option:
+                visual representation and solved sudoku 
         """
         if type(extend) != list:
             return self._solve()
@@ -105,7 +110,7 @@ class Sudoku:
         end = time.time()
 
         if solved is None:
-            return "Could not be solved"
+            return "Could not be solved", None
 
         if "original" in extend:
             res += f"Original:\n{self}\nSolved:\n{solved}\n"
@@ -144,10 +149,14 @@ class Sudoku:
 
     @staticmethod
     def _is_valid_shape(shape):
-        """Check for a valid shape
+        """Check for a valid shape (width equals length)
 
         Args:
             shape (tuple): x and y size
+
+        Returns:
+            True if width equals length
+            otherwise false
         """
         x_size, y_size = shape
         return x_size == y_size
@@ -159,6 +168,9 @@ class Sudoku:
             highlight (tuple): row index and column index indicating the value
                 to be highlighted
                 useful for debugging
+
+        Returns:
+            visual representation of the sudoku
         """
         s = ""
         row_delimiter = "-" * \
