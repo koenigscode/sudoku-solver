@@ -21,10 +21,6 @@ class Sudoku:
         self.values = values.astype("int")
         self.box_size = box_size
 
-    @staticmethod
-    def from_file(path):
-        pass
-
     def first_empty(self):
         for irow, row in enumerate(self.values):
             col_pos = np.where(row == 0)[0]
