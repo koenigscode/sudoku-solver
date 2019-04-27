@@ -2,8 +2,6 @@ import numpy as np
 import time
 from copy import deepcopy
 import colorama
-from colorama import Fore
-from colorama import Style
 from lib.box import Box
 
 colorama.init()
@@ -184,7 +182,8 @@ class Sudoku:
                 if(icol % self.box_size == 0):
                     col.append("|")
                 if(highlight is not None and len(highlight) == 2 and irow == highlight[0] and icol == highlight[1]):
-                    col.append(f"{Fore.RED}{val}{Style.RESET_ALL}")
+                    col.append(
+                        f"{colorama.Fore.RED}{val}{colorama.Style.RESET_ALL}")
                 else:
                     col.append(str(val))
             s += f"{' '.join(col)} |\n"
