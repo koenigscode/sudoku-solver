@@ -132,7 +132,7 @@ class Sudoku:
             res += solved.__repr__()
 
         if "timer" in extend:
-            res += f"Took {end-start}ms"
+            res += f"Took {end-start}s"
 
         return res, solved
 
